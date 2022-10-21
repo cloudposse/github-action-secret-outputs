@@ -18,7 +18,6 @@ inputs:
 outputs:
   out:
     description: "Result of encryption/decryption"
-    value: "${{ steps.context.outputs.action-result }}"
 runs:
   using: 'docker'
   image: 'Dockerfile'
