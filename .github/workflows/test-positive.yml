@@ -65,7 +65,7 @@ jobs:
       - uses: nick-fields/assert-action@v1
         with:
           expected: 'true'
-          actual: "${{ needs.test.outputs.result }}"
+          actual: "${{ needs.test.outputs.masked-result }}"
 
   teardown:
     runs-on: ubuntu-latest
