@@ -36,7 +36,7 @@ jobs:
       - uses: ./
         id: current
         with:
-          secret: ${{ steps.setup.outputs.secret }}
+          secret: ${{ needs.setup.outputs.secret }}
           op: encode
           in: ${{ needs.test.outputs.masked-result }}
 
@@ -53,7 +53,7 @@ jobs:
       - uses: ./
         id: masked-result
         with:
-          secret: ${{ steps.setup.outputs.secret }}
+          secret: ${{ needs.setup.outputs.secret }}
           op: decode
           in: ${{ needs.test.outputs.result }}
 
