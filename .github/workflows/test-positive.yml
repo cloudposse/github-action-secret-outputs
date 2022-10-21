@@ -37,7 +37,7 @@ jobs:
         id: current
         with:
           secret: ${{ steps.setup.outputs.secret }}
-          do: encode
+          op: encode
           in: ${{ needs.test.outputs.masked-result }}
 
     outputs:
@@ -54,7 +54,7 @@ jobs:
         id: masked-result
         with:
           secret: ${{ steps.setup.outputs.secret }}
-          do: decode
+          op: decode
           in: ${{ needs.test.outputs.result }}
 
       - uses: nick-fields/assert-action@v1
