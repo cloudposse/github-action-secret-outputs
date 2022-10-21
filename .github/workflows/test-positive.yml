@@ -64,7 +64,7 @@ jobs:
 
       - uses: nick-fields/assert-action@v1
         with:
-          expected: 'jA0ECQMC7JN/Nxc+RMPn0jwB1saAZ1LWJIaK2g7efWAyaRY3b7t/YoQCrhtxgeiTpAimiH9zmpbhvCiceFPFoUM+QAS3TfylQ/WLqEk='
+          expected: 'jA0ECQMCe4kshWnNpNjt0jwBNMsBaxWYOFzSS2KHR56HVzU0AF+Kp9j8QUZJzt0fbFHuMN3yA5tZfoukt2pLsEdS+XKSZTmtv/lk+eY='
           actual: "${{ needs.test.outputs.masked-result }}"
 
   teardown:
