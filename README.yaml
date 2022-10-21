@@ -5,7 +5,7 @@
 #
 
 # Name of this project
-name: example-github-action-composite
+name: github-action-secret-outputs
 
 # Tags of this project
 tags:
@@ -18,33 +18,43 @@ tags:
 license: "APACHE2"
 
 # Canonical GitHub repo
-github_repo: cloudposse/example-github-action-composite
+github_repo: cloudposse/github-action-secret-outputs
 
 # Badges to display
 badges:
   - name: "Latest Release"
-    image: "https://img.shields.io/github/release/cloudposse/example-github-action-composite.svg"
-    url: "https://github.com/cloudposse/example-github-action-composite/releases/latest"
+    image: "https://img.shields.io/github/release/cloudposse/github-action-secret-outputs.svg"
+    url: "https://github.com/cloudposse/github-action-secret-outputs/releases/latest"
   - name: "Slack Community"
     image: "https://slack.cloudposse.com/badge.svg"
     url: "https://slack.cloudposse.com"
 
-related: []
-
-# Short description of this project
-description: Template repository of composite GitHub Action
-
-introduction: |-
-  This is template repository to create composite GitHub Actions. 
-  Feel free to use it as reference and starting point.
-
-references:
+related:
   - name: "github-actions-workflows"
     description: "Reusable workflows for different types of projects"
     url: "https://github.com/cloudposse/github-actions-workflows"
-  - name: "example-github-action-release-workflow"
-    description: "Example application with complicated release workflow"
-    url: "https://github.com/cloudposse/example-github-action-release-workflow"
+
+# Short description of this project
+description: |-
+  This GitHub Action implemnt [workaround](https://nitratine.net/blog/post/how-to-pass-secrets-between-runners-in-github-actions/) for the problem 
+  [`Combining job outputs with masking leads to empty output`](https://github.com/actions/runner/issues/1498).
+  The problem was described in 
+  [`GitHub Action documentation`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs) 
+  - `Outputs containing secrets are redacted on the runner and not sent to GitHub Actions`.
+
+references:
+  - name: "How to Pass Secrets Between Runners in GitHub Actions"
+    description: "When trying to pass a secret or masked variable between jobs in GitHub Actions using outputs, it will say 'Warning: Skip output since it may contain secrets'. This tutorial aims to provide a reasonable solution for this."
+    url: "https://nitratine.net/blog/post/how-to-pass-secrets-between-runners-in-github-actions/"
+  - name: "Combining job outputs with masking leads to empty output"
+    description: "When combining job outputs with masking the output is empty when used in another job."
+    url: "https://github.com/actions/runner/issues/1498"
+  - name: "Skip output 'AWS_ACCOUNT_ID' since it may contain secret"
+    description: "When combining job outputs with masking the output is empty when used in another job."
+    url: "https://github.com/orgs/community/discussions/26636"
+  - name: "Workflow syntax for GitHub Actions"
+    description: "Outputs containing secrets are redacted on the runner and not sent to GitHub Actions"
+    url: "https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs"
 
 # How to use this project
 usage: |-
@@ -59,14 +69,37 @@ usage: |-
       context:
         runs-on: ubuntu-latest
         steps:
-          - name: Example action
-            uses: cloudposse/example-github-action-composite@main
-            id: example
-            with:
-              param1: true
+          - name: Step with the secret output
+            id: iam
+            run: |
+              echo "role=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/admin" >> $GITHUB_OUTPUT
   
+          - uses: cloudposse/github-action-secret-outputs@main
+            id: role
+            with:
+              secret: ${{ secret.PASSWORD }}
+              op: encode
+              in: ${{ steps.iam.outputs.role }}
+          
         outputs:
-          result: ${{ steps.example.outputs.result1 }}
+          role: ${{ steps.role.outputs.out }}
+  
+      usage:
+        runs-on: ubuntu-latest
+        needs: [context]
+        steps:
+          - uses: cloudposse/github-action-secret-outputs@main
+          id: role
+          with:
+            secret: ${{ secret.PASSWORD }}
+            op: decode
+            in: ${{ needs.context.outputs.role }}
+  
+          - name: Configure AWS Credentials
+            uses: aws-actions/configure-aws-credentials@v1
+            with:
+              role-to-assume: ${{ steps.role.outputs.out }}
+              aws-region: us-east-2
   ```
 
 include:

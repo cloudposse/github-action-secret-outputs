@@ -1,4 +1,4 @@
-name: Test example negative
+name: Test mask output
 on:
 #  # Uncomment when test added first time to register workflow and comment it back after workflow would be registered
 #  #
@@ -22,13 +22,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: ./
-        id: current
-        with:
-          param1: 'false'
+      - name: Set outputs
+        id: masked
+        run: |
+          echo '::add-mask::test'
+          echo This is a test
+          echo "masked-result=test" >> $GITHUB_OUTPUT
+          echo "non-masked-result=example" >> $GITHUB_OUTPUT
 
     outputs:
-      result: "${{ steps.current.outputs.result1 }}"
+      masked-result: "${{ steps.masked.outputs.masked-result }}"
+      non-masked-result: "${{ steps.masked.outputs.non-masked-result }}"
 
   assert:
     runs-on: ubuntu-latest
@@ -36,8 +40,13 @@ jobs:
     steps:
       - uses: nick-fields/assert-action@v1
         with:
-          expected: 'false'
-          actual: "${{ needs.test.outputs.result }}"
+          expected: ''
+          actual: "${{ needs.test.outputs.masked-result }}"
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: 'example'
+          actual: "${{ needs.test.outputs.non-masked-result }}"
 
   teardown:
     runs-on: ubuntu-latest
