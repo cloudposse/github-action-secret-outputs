@@ -5,19 +5,39 @@ branding:
   icon: 'file'
   color: 'white'
 inputs:
-  param1:
+  op:
     required: true
-    description: "Input parameter placeholder"
-    default: "true"
+    description: "Operation to perform (encode or decode)"
+    default: "encode"
+  in:
+    required: true
+    description: "Input data"
+  secret:
+    required: true
+    description: "Secret to encrypt/decrypt data"
 outputs:
-  result1:
-    description: "Output result placeholder"
+  out:
+    description: "Result of encryption/decryption"
     value: "${{ steps.context.outputs.action-result }}"
 runs:
   using: "composite"
   steps:
-    - id: context
+    - uses: olafurpg/setup-gpg@v3
+    - id: code
       shell: bash
       run: |
-          echo "::set-output name=action-result::${{ inputs.param1 }}"
-
+        case "${{ inputs.op }}" in
+          encode)
+            result=$(gpg --symmetric --batch --passphrase "${{ inputs.secret }}" --output - <(echo "${{ inputs.in }}") | base64 -w0)
+            echo "out=${result}" >> $GITHUB_OUTPUT
+            ;;
+           
+          decode)
+            result=$(gpg --decrypt --quiet --batch --passphrase "${{ inputs.secret }}" --output - <(echo "${{ inputs.in }}" | base64 --decode))
+            echo "out=${result}" >> $GITHUB_OUTPUT            
+            ;;
+           
+          *)
+            echo $"op input can be only {encode|decode}"
+            exit 1  
+        esac
