@@ -20,24 +20,9 @@ outputs:
     description: "Result of encryption/decryption"
     value: "${{ steps.context.outputs.action-result }}"
 runs:
-  using: "composite"
-  steps:
-    - uses: olafurpg/setup-gpg@v3
-    - id: code
-      shell: bash
-      run: |
-        case "${{ inputs.op }}" in
-          encode)
-            result=$(gpg --symmetric --batch --passphrase "${{ inputs.secret }}" --output - <(echo "${{ inputs.in }}") | base64 -w0)
-            echo "out=${result}" >> $GITHUB_OUTPUT
-            ;;
-           
-          decode)
-            result=$(gpg --decrypt --quiet --batch --passphrase "${{ inputs.secret }}" --output - <(echo "${{ inputs.in }}" | base64 --decode))
-            echo "out=${result}" >> $GITHUB_OUTPUT            
-            ;;
-           
-          *)
-            echo $"op input can be only {encode|decode}"
-            exit 1  
-        esac
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    OPERATION: ${{ inputs.op }}
+    IN: ${{ inputs.in }}
+    SECRET: ${{ inputs.secret }}
