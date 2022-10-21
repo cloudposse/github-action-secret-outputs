@@ -30,11 +30,6 @@ jobs:
           echo "masked-result=test" >> $GITHUB_OUTPUT
           echo "non-masked-result=example" >> $GITHUB_OUTPUT
 
-      - uses: ./
-        id: current
-        with:
-          param1: 'false'
-
     outputs:
       masked-result: "${{ steps.masked.outputs.masked-result }}"
       non-masked-result: "${{ steps.masked.outputs.non-masked-result }}"

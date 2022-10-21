@@ -14,6 +14,9 @@ jobs:
       - name: Setup
         run: echo "Do setup"
 
+    outputs:
+      secret: test123
+
   test:
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -22,18 +25,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Set outputs
+        id: masked
+        run: |
+          echo '::add-mask::test'
+          echo This is a test
+          echo "masked-result=test" >> $GITHUB_OUTPUT
+          echo "non-masked-result=example" >> $GITHUB_OUTPUT
+
       - uses: ./
         id: current
         with:
-          param1: 'true'
+          secret: ${{ steps.setup.outputs.secret }}
+          do: encode
+          in: ${{ needs.test.outputs.masked-result }}
 
     outputs:
-      result: "${{ steps.current.outputs.result1 }}"
+      result: "${{ steps.current.outputs.out }}"
 
   assert:
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [setup, test]
     steps:
+      - uses: ./
+        id: masked-result
+        with:
+          secret: ${{ steps.setup.outputs.secret }}
+          do: decode
+          in: ${{ needs.test.outputs.result }}
+
+      - uses: nick-fields/assert-action@v1
+        with:
+          expected: 'test'
+          actual: "${{ steps.test.masked-result.out }}"
+
       - uses: nick-fields/assert-action@v1
         with:
           expected: 'true'
