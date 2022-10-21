@@ -36,7 +36,7 @@ related:
 
 # Short description of this project
 description: |-
-  This GitHub Action implemnt [workaround](https://nitratine.net/blog/post/how-to-pass-secrets-between-runners-in-github-actions/) for the problem 
+  This GitHub Action implement [workaround](https://nitratine.net/blog/post/how-to-pass-secrets-between-runners-in-github-actions/) for the problem 
   [`Combining job outputs with masking leads to empty output`](https://github.com/actions/runner/issues/1498).
   The problem was described in 
   [`GitHub Action documentation`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs) 
