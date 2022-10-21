@@ -1,6 +1,6 @@
 
 <!-- markdownlint-disable -->
-# example-github-action-composite [![Latest Release](https://img.shields.io/github/release/cloudposse/example-github-action-composite.svg)](https://github.com/cloudposse/example-github-action-composite/releases/latest) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
+# github-action-secret-outputs [![Latest Release](https://img.shields.io/github/release/cloudposse/github-action-secret-outputs.svg)](https://github.com/cloudposse/github-action-secret-outputs/releases/latest) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
 <!-- markdownlint-restore -->
 
 [![README Header][readme_header_img]][readme_header_link]
@@ -28,7 +28,11 @@
 
 -->
 
-Template repository of composite GitHub Action
+This GitHub Action implemnt [workaround](https://nitratine.net/blog/post/how-to-pass-secrets-between-runners-in-github-actions/) for the problem 
+[`Combining job outputs with masking leads to empty output`](https://github.com/actions/runner/issues/1498).
+The problem was described in 
+[`GitHub Action documentation`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs) 
+- `Outputs containing secrets are redacted on the runner and not sent to GitHub Actions`.
 
 ---
 
@@ -56,11 +60,6 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
 
 
 
-## Introduction
-
-This is template repository to create composite GitHub Actions. 
-Feel free to use it as reference and starting point.
-
 
 
 
@@ -80,14 +79,37 @@ Feel free to use it as reference and starting point.
     context:
       runs-on: ubuntu-latest
       steps:
-        - name: Example action
-          uses: cloudposse/example-github-action-composite@main
-          id: example
-          with:
-            param1: true
+        - name: Step with the secret output
+          id: iam
+          run: |
+            echo "role=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/admin" >> $GITHUB_OUTPUT
 
+        - uses: cloudposse/github-action-secret-outputs@main
+          id: role
+          with:
+            secret: ${{ secret.PASSWORD }}
+            op: encode
+            in: ${{ steps.iam.outputs.role }}
+        
       outputs:
-        result: ${{ steps.example.outputs.result1 }}
+        role: ${{ steps.role.outputs.out }}
+
+    usage:
+      runs-on: ubuntu-latest
+      needs: [context]
+      steps:
+        - uses: cloudposse/github-action-secret-outputs@main
+        id: role
+        with:
+          secret: ${{ secret.PASSWORD }}
+          op: decode
+          in: ${{ needs.context.outputs.role }}
+
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v1
+          with:
+            role-to-assume: ${{ steps.role.outputs.out }}
+            aws-region: us-east-2
 ```
 
 
@@ -96,24 +118,28 @@ Feel free to use it as reference and starting point.
 
 
 <!-- markdownlint-disable -->
+
 ## Inputs
 
 | Name | Description | Default | Required |
 |------|-------------|---------|----------|
-| param1 | Input parameter placeholder | true | true |
+| in | Input data | N/A | true |
+| op | Operation to perform (encode or decode) | encode | true |
+| secret | Secret to encrypt/decrypt data | N/A | true |
+
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| result1 | Output result placeholder |
+| out | Result of encryption/decryption |
 <!-- markdownlint-restore -->
 
 
 
 ## Share the Love
 
-Like this project? Please give it a ★ on [our GitHub](https://github.com/cloudposse/example-github-action-composite)! (it helps us **a lot**)
+Like this project? Please give it a ★ on [our GitHub](https://github.com/cloudposse/github-action-secret-outputs)! (it helps us **a lot**)
 
 Are you using this project or any of our other projects? Consider [leaving a testimonial][testimonial]. =)
 
@@ -123,21 +149,24 @@ Are you using this project or any of our other projects? Consider [leaving a tes
 
 Check out these related projects.
 
+- [github-actions-workflows](https://github.com/cloudposse/github-actions-workflows) - Reusable workflows for different types of projects
 
 
 ## References
 
 For additional context, refer to some of these links.
 
-- [github-actions-workflows](https://github.com/cloudposse/github-actions-workflows) - Reusable workflows for different types of projects
-- [example-github-action-release-workflow](https://github.com/cloudposse/example-github-action-release-workflow) - Example application with complicated release workflow
+- [How to Pass Secrets Between Runners in GitHub Actions](https://nitratine.net/blog/post/how-to-pass-secrets-between-runners-in-github-actions/) - When trying to pass a secret or masked variable between jobs in GitHub Actions using outputs, it will say 'Warning: Skip output since it may contain secrets'. This tutorial aims to provide a reasonable solution for this.
+- [Combining job outputs with masking leads to empty output](https://github.com/actions/runner/issues/1498) - When combining job outputs with masking the output is empty when used in another job.
+- [Skip output 'AWS_ACCOUNT_ID' since it may contain secret](https://github.com/orgs/community/discussions/26636) - When combining job outputs with masking the output is empty when used in another job.
+- [Workflow syntax for GitHub Actions](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs) - Outputs containing secrets are redacted on the runner and not sent to GitHub Actions
 
 
 ## Help
 
 **Got a question?** We got answers.
 
-File a GitHub [issue](https://github.com/cloudposse/example-github-action-composite/issues), send us an [email][email] or join our [Slack Community][slack].
+File a GitHub [issue](https://github.com/cloudposse/github-action-secret-outputs/issues), send us an [email][email] or join our [Slack Community][slack].
 
 [![README Commercial Support][readme_commercial_support_img]][readme_commercial_support_link]
 
@@ -185,7 +214,7 @@ Sign up for [our newsletter][newsletter] that covers everything on our technolog
 
 ### Bug Reports & Feature Requests
 
-Please use the [issue tracker](https://github.com/cloudposse/example-github-action-composite/issues) to report any bugs or file feature requests.
+Please use the [issue tracker](https://github.com/cloudposse/github-action-secret-outputs/issues) to report any bugs or file feature requests.
 
 ### Developing
 
@@ -273,33 +302,33 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 [![Beacon][beacon]][website]
 <!-- markdownlint-disable -->
   [logo]: https://cloudposse.com/logo-300x69.svg
-  [docs]: https://cpco.io/docs?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=docs
-  [website]: https://cpco.io/homepage?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=website
-  [github]: https://cpco.io/github?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=github
-  [jobs]: https://cpco.io/jobs?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=jobs
-  [hire]: https://cpco.io/hire?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=hire
-  [slack]: https://cpco.io/slack?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=slack
-  [linkedin]: https://cpco.io/linkedin?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=linkedin
-  [twitter]: https://cpco.io/twitter?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=twitter
-  [testimonial]: https://cpco.io/leave-testimonial?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=testimonial
-  [office_hours]: https://cloudposse.com/office-hours?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=office_hours
-  [newsletter]: https://cpco.io/newsletter?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=newsletter
-  [discourse]: https://ask.sweetops.com/?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=discourse
-  [email]: https://cpco.io/email?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=email
-  [commercial_support]: https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=commercial_support
-  [we_love_open_source]: https://cpco.io/we-love-open-source?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=we_love_open_source
-  [terraform_modules]: https://cpco.io/terraform-modules?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=terraform_modules
+  [docs]: https://cpco.io/docs?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=docs
+  [website]: https://cpco.io/homepage?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=website
+  [github]: https://cpco.io/github?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=github
+  [jobs]: https://cpco.io/jobs?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=jobs
+  [hire]: https://cpco.io/hire?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=hire
+  [slack]: https://cpco.io/slack?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=slack
+  [linkedin]: https://cpco.io/linkedin?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=linkedin
+  [twitter]: https://cpco.io/twitter?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=twitter
+  [testimonial]: https://cpco.io/leave-testimonial?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=testimonial
+  [office_hours]: https://cloudposse.com/office-hours?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=office_hours
+  [newsletter]: https://cpco.io/newsletter?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=newsletter
+  [discourse]: https://ask.sweetops.com/?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=discourse
+  [email]: https://cpco.io/email?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=email
+  [commercial_support]: https://cpco.io/commercial-support?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=commercial_support
+  [we_love_open_source]: https://cpco.io/we-love-open-source?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=we_love_open_source
+  [terraform_modules]: https://cpco.io/terraform-modules?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=terraform_modules
   [readme_header_img]: https://cloudposse.com/readme/header/img
-  [readme_header_link]: https://cloudposse.com/readme/header/link?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=readme_header_link
+  [readme_header_link]: https://cloudposse.com/readme/header/link?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=readme_header_link
   [readme_footer_img]: https://cloudposse.com/readme/footer/img
-  [readme_footer_link]: https://cloudposse.com/readme/footer/link?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=readme_footer_link
+  [readme_footer_link]: https://cloudposse.com/readme/footer/link?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=readme_footer_link
   [readme_commercial_support_img]: https://cloudposse.com/readme/commercial-support/img
-  [readme_commercial_support_link]: https://cloudposse.com/readme/commercial-support/link?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/example-github-action-composite&utm_content=readme_commercial_support_link
-  [share_twitter]: https://twitter.com/intent/tweet/?text=example-github-action-composite&url=https://github.com/cloudposse/example-github-action-composite
-  [share_linkedin]: https://www.linkedin.com/shareArticle?mini=true&title=example-github-action-composite&url=https://github.com/cloudposse/example-github-action-composite
-  [share_reddit]: https://reddit.com/submit/?url=https://github.com/cloudposse/example-github-action-composite
-  [share_facebook]: https://facebook.com/sharer/sharer.php?u=https://github.com/cloudposse/example-github-action-composite
-  [share_googleplus]: https://plus.google.com/share?url=https://github.com/cloudposse/example-github-action-composite
-  [share_email]: mailto:?subject=example-github-action-composite&body=https://github.com/cloudposse/example-github-action-composite
-  [beacon]: https://ga-beacon.cloudposse.com/UA-76589703-4/cloudposse/example-github-action-composite?pixel&cs=github&cm=readme&an=example-github-action-composite
+  [readme_commercial_support_link]: https://cloudposse.com/readme/commercial-support/link?utm_source=github&utm_medium=readme&utm_campaign=cloudposse/github-action-secret-outputs&utm_content=readme_commercial_support_link
+  [share_twitter]: https://twitter.com/intent/tweet/?text=github-action-secret-outputs&url=https://github.com/cloudposse/github-action-secret-outputs
+  [share_linkedin]: https://www.linkedin.com/shareArticle?mini=true&title=github-action-secret-outputs&url=https://github.com/cloudposse/github-action-secret-outputs
+  [share_reddit]: https://reddit.com/submit/?url=https://github.com/cloudposse/github-action-secret-outputs
+  [share_facebook]: https://facebook.com/sharer/sharer.php?u=https://github.com/cloudposse/github-action-secret-outputs
+  [share_googleplus]: https://plus.google.com/share?url=https://github.com/cloudposse/github-action-secret-outputs
+  [share_email]: mailto:?subject=github-action-secret-outputs&body=https://github.com/cloudposse/github-action-secret-outputs
+  [beacon]: https://ga-beacon.cloudposse.com/UA-76589703-4/cloudposse/github-action-secret-outputs?pixel&cs=github&cm=readme&an=github-action-secret-outputs
 <!-- markdownlint-restore -->
