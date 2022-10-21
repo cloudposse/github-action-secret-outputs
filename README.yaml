@@ -50,7 +50,7 @@ references:
     description: "When combining job outputs with masking the output is empty when used in another job."
     url: "https://github.com/actions/runner/issues/1498"
   - name: "Skip output 'AWS_ACCOUNT_ID' since it may contain secret"
-    description: "When combining job outputs with masking the output is empty when used in another job."
+    description: "aws-actions/configure-aws-credentials@v1 will addMask for our aws accountid"
     url: "https://github.com/orgs/community/discussions/26636"
   - name: "Workflow syntax for GitHub Actions"
     description: "Outputs containing secrets are redacted on the runner and not sent to GitHub Actions"
