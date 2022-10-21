@@ -13,7 +13,6 @@ jobs:
     steps:
       - name: Setup
         run: echo "Do setup"
-
     outputs:
       secret: test123
 
@@ -38,10 +37,11 @@ jobs:
         with:
           secret: ${{ needs.setup.outputs.secret }}
           op: encode
-          in: ${{ needs.test.outputs.masked-result }}
+          in: ${{ steps.masked.outputs.masked-result }}
 
     outputs:
-      result: "${{ steps.current.outputs.out }}"
+      masked-result: "${{ steps.current.outputs.out }}"
+      non-masked-result: "${{ steps.masked.outputs.non-masked-result }}"
 
   assert:
     runs-on: ubuntu-latest
@@ -55,7 +55,7 @@ jobs:
         with:
           secret: ${{ needs.setup.outputs.secret }}
           op: decode
-          in: ${{ needs.test.outputs.result }}
+          in: ${{ needs.test.outputs.masked-result }}
 
       - uses: nick-fields/assert-action@v1
         with:
