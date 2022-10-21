@@ -10,6 +10,7 @@ case "${OPERATION}" in
 
 	decode)
 		result=$(gpg --decrypt --quiet --batch --passphrase "${SECRET}" --output - <(echo "${IN}" | base64 -d))
+		echo "::add-mask::${result}"
 		echo "out=${result}" >> $GITHUB_OUTPUT
 		;;
 

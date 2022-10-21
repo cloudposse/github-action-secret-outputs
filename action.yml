@@ -1,8 +1,8 @@
-name: 'Example composite GitHub action'
-description: 'Example composite GitHub action'
+name: 'Secret output'
+description: 'Allow outputs that contains secrets to be passed between jobs by encrypting them.'
 author: hello@cloudposse.com
 branding:
-  icon: 'file'
+  icon: 'shield'
   color: 'white'
 inputs:
   op:
