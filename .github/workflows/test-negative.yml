@@ -1,4 +1,4 @@
-name: Test example negative
+name: Test mask output
 on:
 #  # Uncomment when test added first time to register workflow and comment it back after workflow would be registered
 #  #
