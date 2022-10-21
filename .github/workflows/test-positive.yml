@@ -60,7 +60,7 @@ jobs:
       - uses: nick-fields/assert-action@v1
         with:
           expected: 'test'
-          actual: "${{ steps.test.masked-result.out }}"
+          actual: "${{ steps. masked-result.outputs.out }}"
 
       - uses: nick-fields/assert-action@v1
         with:
