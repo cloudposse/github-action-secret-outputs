@@ -62,11 +62,6 @@ jobs:
           expected: 'test'
           actual: "${{ steps. masked-result.outputs.out }}"
 
-      - uses: nick-fields/assert-action@v1
-        with:
-          expected: 'jA0ECQMCe4kshWnNpNjt0jwBNMsBaxWYOFzSS2KHR56HVzU0AF+Kp9j8QUZJzt0fbFHuMN3yA5tZfoukt2pLsEdS+XKSZTmtv/lk+eY='
-          actual: "${{ needs.test.outputs.masked-result }}"
-
   teardown:
     runs-on: ubuntu-latest
     needs: [assert]
