@@ -37,7 +37,7 @@ jobs:
 
     outputs:
       masked-result: "${{ steps.masked.outputs.masked-result }}"
-      masked-non-masked-result: "${{ steps.masked.outputs.non-masked-result }}"
+      non-masked-result: "${{ steps.masked.outputs.non-masked-result }}"
 
   assert:
     runs-on: ubuntu-latest
