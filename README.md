@@ -158,7 +158,7 @@ For additional context, refer to some of these links.
 
 - [How to Pass Secrets Between Runners in GitHub Actions](https://nitratine.net/blog/post/how-to-pass-secrets-between-runners-in-github-actions/) - When trying to pass a secret or masked variable between jobs in GitHub Actions using outputs, it will say 'Warning: Skip output since it may contain secrets'. This tutorial aims to provide a reasonable solution for this.
 - [Combining job outputs with masking leads to empty output](https://github.com/actions/runner/issues/1498) - When combining job outputs with masking the output is empty when used in another job.
-- [Skip output 'AWS_ACCOUNT_ID' since it may contain secret](https://github.com/orgs/community/discussions/26636) - When combining job outputs with masking the output is empty when used in another job.
+- [Skip output 'AWS_ACCOUNT_ID' since it may contain secret](https://github.com/orgs/community/discussions/26636) - aws-actions/configure-aws-credentials@v1 will addMask for our aws accountid
 - [Workflow syntax for GitHub Actions](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idoutputs) - Outputs containing secrets are redacted on the runner and not sent to GitHub Actions
 
 
