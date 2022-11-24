@@ -87,7 +87,8 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
         - uses: cloudposse/github-action-secret-outputs@main
           id: role
           with:
-            secret: ${{ secret.PASSWORD }}
+            ## PASSWORD is a gpg passphrase stored in Github Secrets.
+            secret: ${{ secrets.PASSWORD }}
             op: encode
             in: ${{ steps.iam.outputs.role }}
         
@@ -99,11 +100,12 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
       needs: [context]
       steps:
         - uses: cloudposse/github-action-secret-outputs@main
-        id: role
-        with:
-          secret: ${{ secret.PASSWORD }}
-          op: decode
-          in: ${{ needs.context.outputs.role }}
+          id: role
+          with:
+            ## PASSWORD is a gpg passphrase stored in Github Secrets.          
+            secret: ${{ secrets.PASSWORD }}
+            op: decode
+            in: ${{ needs.context.outputs.role }}
 
         - name: Configure AWS Credentials
           uses: aws-actions/configure-aws-credentials@v1
