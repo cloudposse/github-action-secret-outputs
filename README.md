@@ -87,7 +87,7 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
         - uses: cloudposse/github-action-secret-outputs@main
           id: role
           with:
-            secret: ${{ secret.PASSWORD }}
+            secret: ${{ secrets.PASSWORD }}
             op: encode
             in: ${{ steps.iam.outputs.role }}
         
@@ -101,7 +101,7 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
         - uses: cloudposse/github-action-secret-outputs@main
         id: role
         with:
-          secret: ${{ secret.PASSWORD }}
+          secret: ${{ secrets.PASSWORD }}
           op: decode
           in: ${{ needs.context.outputs.role }}
 
