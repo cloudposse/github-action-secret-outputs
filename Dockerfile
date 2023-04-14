@@ -1,4 +1,4 @@
-FROM alpine:3.16.2
+FROM public.ecr.aws/docker/library/alpine:3.17.3
 
 RUN apk add --no-cache gnupg bash
 
