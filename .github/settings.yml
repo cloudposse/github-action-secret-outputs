@@ -1,0 +1,7 @@
+# Upstream changes from _extends are only recognized when modifications are made to this file in the default branch.
+_extends: .github
+repository:
+  name: github-action-secret-outputs
+  description: Allow to pass a secret or masked variable between jobs in GitHub Actions using outputs.
+  homepage: https://cloudposse.com/accelerate
+  topics: ""
