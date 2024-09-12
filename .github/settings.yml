@@ -5,3 +5,4 @@ repository:
   description: Allow to pass a secret or masked variable between jobs in GitHub Actions using outputs.
   homepage: https://cloudposse.com/accelerate
   topics: ""
+
